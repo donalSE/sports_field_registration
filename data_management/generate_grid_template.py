@@ -16,13 +16,13 @@ def draw_point(data, x, y, channel, spot_size = (1, 1)) :
 if __name__ == '__main__' :
     data_path_np = "./grid"
 
-    field_length = 115
-    markers = np.linspace(0, field_length, 15)
-    field_width = 74
-    lines = np.linspace(0, field_width, 7)
+    field_length = 145
+    markers = np.linspace(0, field_length, 20)
+    field_width = 88
+    lines = np.linspace(0, field_width, 9)
 
     # img_size = (256, 256)
-    img_size = (720, 1280)
+    img_size = (1080, 1920)
 
     spot_size = (10, 15) # pixel size of each element
     # spot_size = (3, 6) # pixel size of each element

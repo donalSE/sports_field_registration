@@ -75,12 +75,12 @@ if __name__ == "__main__" :
 
                 lines_nb = 7
                 try :
-                    img = imread(os.path.join('/path/to/WorldCup Soccer Homography/train_val/images/train',
+                    img = imread(os.path.join('/path/to/WorldCup Soccer Homography/train_val/training_data/train',
                                               img_name.replace('homographyMatrix', 'jpg')))
                     img = resize(img, final_size)
                 except :
                     img = imread(
-                        os.path.join('/path/to/WorldCup Soccer Homography/train_val/images/val',
+                        os.path.join('/path/to/WorldCup Soccer Homography/train_val/training_data/val',
                                      img_name.replace('homographyMatrix', 'jpg')))
                     img = resize(img, final_size)
                 flat_max = np.max(result, axis=2)

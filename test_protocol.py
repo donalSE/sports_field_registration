@@ -72,28 +72,28 @@ if __name__=='__main__':
     size = (256, 256)
 
     threshold = 0.75
-    model = vanilla_Unet2(final_depth=len(lines_y) + len(markers_x))
+    model = vanilla_Unet2(final_depth=30)
     batch_size = 64
     models_path = './models/'
 
-    ### SWIMMING POOL REGISTATION ###
-    field_length = 50
-    markers_x = np.linspace(0, field_length, 11)
-    field_width = 25
-    lines_y = np.linspace(0, field_width, 11)
-    path = 'pool model.pth'
-    full_images_path = 'path/to/Neptune Dataset/frames/test'
-    homographies_path = '/path/to/Neptune Dataset/homographies'
-    ###
-    
-    # ### SOCCER REGISTRATION ###
-    # field_length = 115
+    # ### SWIMMING POOL REGISTATION ###
+    # field_length = 50
     # markers_x = np.linspace(0, field_length, 11)
-    # field_width = 74
+    # field_width = 25
     # lines_y = np.linspace(0, field_width, 11)
-    # path = 'soccer model.pth'
-    # full_images_path = 'path/to/WorldCup Soccer Dataset/frames/test'
-    # homographies_path = '/path/to/WorldCup Soccer Dataset/homographies'
+    # path = 'pool model.pth'
+    # full_images_path = 'path/to/Neptune Dataset/frames/test'
+    # homographies_path = '/path/to/Neptune Dataset/homographies'
+    # ###
+    
+    ### SOCCER REGISTRATION ###
+    field_length = 145
+    markers_x = np.linspace(0, field_length, 20)
+    field_width = 88
+    lines_y = np.linspace(0, field_width, 10)
+    path = 'soccer model.pth'
+    full_images_path = 'path/to/WorldCup Soccer Dataset/frames/test'
+    homographies_path = '/path/to/WorldCup Soccer Dataset/homographies'
     # ###
 
     model_path = os.path.join(models_path, path)

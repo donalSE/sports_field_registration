@@ -25,7 +25,7 @@ class Dataloader(Dataset) :
                         for f in homographies_name]
         self.homographies = homographies
 
-        self.len = len(self.yes_img) # - 2 # -2 because 3 images stacking
+        self.len = len(self.yes_img) # - 2 # -2 because 3 training_data stacking
 
     def __len__(self) :
         return self.len

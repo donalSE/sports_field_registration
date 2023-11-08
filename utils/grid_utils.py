@@ -53,7 +53,7 @@ def display_on_image(img, pool_x, pool_y, img_x, img_y) :
 
 
 def get_homography_from_points(src_pts, dst_pts, size=(256, 256), homography_method=cv2.RANSAC,
-                               field_length=115, field_width=74) :
+                               field_length=145, field_width=88) :
     if len(src_pts) < 4 : return None
 
     x_coef = size[0] / field_length
@@ -101,8 +101,8 @@ def get_landmarks_positions(img, out, threshold, lines_nb = 11, write_on_image=T
 
 def dataset_test_landmarks(img, out, threshold, lines_nb = 11, write_on_image=True,
                             markers_x=None, lines_y=None) :
-    if markers_x is None: markers_x = np.linspace(0, 115, 15)
-    if lines_y is None: lines_y = np.linspace(0, 74, 11)
+    if markers_x is None: markers_x = np.linspace(0, 145, 20)
+    if lines_y is None: lines_y = np.linspace(0, 88, 9)
     src_pts = []
     dst_pts = []
     x_list, y_list = get_local_maxima(out, threshold=threshold)
@@ -122,8 +122,8 @@ def dataset_test_landmarks(img, out, threshold, lines_nb = 11, write_on_image=Tr
 
 def get_faster_landmarks_positions(img, out, threshold, lines_nb = 11, write_on_image=True,
                             markers_x=None, lines_y=None) :
-    if markers_x is None: markers_x = np.linspace(0, 115, 15)
-    if lines_y is None: lines_y = np.linspace(0, 74, 11)
+    if markers_x is None: markers_x = np.linspace(0, 145, 20)
+    if lines_y is None: lines_y = np.linspace(0, 88, 9)
     src_pts = []
     dst_pts = []
     entropies = []

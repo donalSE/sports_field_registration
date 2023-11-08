@@ -23,7 +23,7 @@ RegiSwim Dataset is available at [this link](https://drive.google.com/drive/u/0/
 
 This dataset is a new benchmark for sport fields registration. It focuses on swimming pools, as these environments contain many interesting and unique properties to increase the challenge in image registration (levels of zoom, light saturation, changing background...).
 
-![The Neptune Registration Dataset](/images/dataset.png)
+![The Neptune Registration Dataset](/im_ge/dataset.png)
 
  If you use it, please cite :
  

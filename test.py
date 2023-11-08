@@ -82,10 +82,10 @@ if __name__=='__main__':
     save_projection = True
     # save_projection = False
 
-    field_length = 50
-    markers_x = np.linspace(0, field_length, 11)
-    field_width = 25
-    lines_y = np.linspace(0, field_width, 11)
+    field_length = 145
+    markers_x = np.linspace(0, field_length, 20)
+    field_width = 88
+    lines_y = np.linspace(0, field_width, 10)
 
     path = 'pool model.pth'
     model = vanilla_Unet2(final_depth=len(markers_x) + len(lines_y))
@@ -94,14 +94,14 @@ if __name__=='__main__':
 
     models_path = './models/'
 
-    full_images_path = '/home/nicolas/datasets/Neptune Dataset/frames/test'
+    full_images_path = '/Users/donalconlon/Documents/homographies.csv'
 
 
     video_name = get_video_name(epochs, full_images_path, size, "", save_projection, threshold)
     video_path = './videos/' + video_name
 
     model_path = os.path.join(models_path, path)
-    model.load_state_dict(load(model_path))
+    model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
     model = model.cuda()
     model.eval()
 
