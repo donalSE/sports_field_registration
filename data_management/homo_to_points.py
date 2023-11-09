@@ -31,12 +31,12 @@ if __name__ == "__main__" :
     if not os.path.exists(save_path) : os.mkdir(save_path)
     files_list = os.listdir(save_path)
 
-    labels_path = '/path/to/WorldCup Soccer Homography/train_val/homographies'
+    labels_path = './homograph.csv'
     files = os.listdir(labels_path)
     files = [f for f in files if f.endswith(".homographyMatrix")]
     matrices = [np.loadtxt(os.path.join(labels_path, f)) for f in files]
 
-    out_size = (1280, 720)
+    out_size = (1920, 1080)
     final_size = (256, 256)
 
     display = False
@@ -75,12 +75,12 @@ if __name__ == "__main__" :
 
                 lines_nb = 7
                 try :
-                    img = imread(os.path.join('/path/to/WorldCup Soccer Homography/train_val/training_data/train',
+                    img = imread(os.path.join('/im_ge/training_data/train',
                                               img_name.replace('homographyMatrix', 'jpg')))
                     img = resize(img, final_size)
                 except :
                     img = imread(
-                        os.path.join('/path/to/WorldCup Soccer Homography/train_val/training_data/val',
+                        os.path.join('im_ge/training_data/valid',
                                      img_name.replace('homographyMatrix', 'jpg')))
                     img = resize(img, final_size)
                 flat_max = np.max(result, axis=2)
