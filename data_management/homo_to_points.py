@@ -9,8 +9,7 @@ import matplotlib
 matplotlib.use('TkAgg')
 
 
-
-def get_matrix(data, out_size=(256, 256), in_size=(1000, 500)) :
+def get_matrix(data, out_size=(256, 256), in_size=(1920, 1080)) :
     src_pts = data.source_points.numpy()
     src_pts[:, 0] = src_pts[:, 0] * out_size[0] / in_size[0]
     src_pts[:, 1] = src_pts[:, 1] * out_size / in_size[1]
@@ -25,22 +24,23 @@ def get_matrix(data, out_size=(256, 256), in_size=(1000, 500)) :
 if __name__ == "__main__" :
     # save_path = "./dense_grid/"
     # template_path = './dense_grid.npy'
-    save_path = "./grid/"
+    save_path = "grid"
     template_path = './grid.npy'
+    labels_path = 'homography_matrices/'
 
-    if not os.path.exists(save_path) : os.mkdir(save_path)
-    files_list = os.listdir(save_path)
+    if not os.path.exists(save_path):
+        os.mkdir(save_path)
 
-    labels_path = './homograph.csv'
     files = os.listdir(labels_path)
-    files = [f for f in files if f.endswith(".homographyMatrix")]
-    matrices = [np.loadtxt(os.path.join(labels_path, f)) for f in files]
+    files = [f for f in files if f.endswith(".npy")]
+    # Load each homography matrix as a numpy array
+    matrices = [np.load(os.path.join(labels_path, f)) for f in files]
 
     out_size = (1920, 1080)
     final_size = (256, 256)
 
-    display = False
-    # display = True
+    #display = False
+    display = True
 
     template = np.load(template_path)
     template = np.swapaxes(template, 2, 0)
@@ -75,13 +75,13 @@ if __name__ == "__main__" :
 
                 lines_nb = 7
                 try :
-                    img = imread(os.path.join('/im_ge/training_data/train',
-                                              img_name.replace('homographyMatrix', 'jpg')))
+                    img = imread(os.path.join('./im_ge/training_data/train',
+                                              img_name.replace('homography.npy', 'jpg')))
                     img = resize(img, final_size)
                 except :
                     img = imread(
-                        os.path.join('im_ge/training_data/valid',
-                                     img_name.replace('homographyMatrix', 'jpg')))
+                        os.path.join('./im_ge/training_data/valid',
+                                     img_name.replace('homography.npy', 'jpg')))
                     img = resize(img, final_size)
                 flat_max = np.max(result, axis=2)
                 flat_max = np.expand_dims(flat_max, axis=2)

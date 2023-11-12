@@ -8,15 +8,15 @@ from copy import deepcopy
 from sklearn.utils import shuffle
 from imageio import mimread
 import cv2
-from cv2 import resize, GaussianBlur, findHomography,\
-                warpPerspective, getRotationMatrix2D, warpAffine
+from cv2 import resize, GaussianBlur, findHomography, \
+    warpPerspective, getRotationMatrix2D, warpAffine
 from utils.homography_utils import augment_matrix
 import numpy as np
 from random import random
 
 
-class Dataloader(Dataset) :
-    def __init__(self, img_path, out_path, size, augment_data=True, lines_nb=5) :
+class Dataloader(Dataset):
+    def __init__(self, img_path, out_path, size, augment_data=True, lines_nb=5):
         self.transform = self.get_transform()
         self.augment_data = augment_data
         self.size = size
@@ -30,47 +30,60 @@ class Dataloader(Dataset) :
         self.yes_img = yes_img
 
         yes_out = os.listdir(out_path)
+
         yes_out.sort()
         yes_out.sort(key=len)
         dico = {}
-        for f in yes_out :
+        for f in yes_out:
             dico[f] = os.path.join(out_path, f)
         self.yes_out = dico
-
         self.len = len(self.yes_img)
 
         self.lines_nb = lines_nb
 
-    def __len__(self) :
+    def __len__(self):
         return self.len
 
     def __getitem__(self, idx):
         img_path = self.yes_img[idx]
+        print(f"Attempting to read image from path: {img_path}")
         img = io.imread(img_path)
+        print(self.yes_out)
+        # Extract the base name without extension and directory path
+        base_name = os.path.basename(img_path)  # Get the file name without path
+        img_name, _ = os.path.splitext(base_name)  # Get the root name without extension
 
-        img_name = img_path.split('/')[-1]
-        out_name = img_name.replace("jpg", "homography.npy")
+        # Replace the last occurrence of 'jpg' with 'homography.npy'
+        out_name_parts = base_name.rsplit("jpg", 1)
+        out_name = out_name_parts[0] + "homography.npy" if len(out_name_parts) == 2 else base_name
+
         out_name = self.yes_out[out_name]
+        print(out_name)
         out = np.load(out_name) / 255
+
+        # Right before the line causing the error
+        print(f"Shape of out before resizing: {out.shape}")
         out = cv2.resize(out, (img.shape[1], img.shape[0]))
+        print(f"Shape of out after resizing: {out.shape}")
 
-        if self.augment_data :
-
-            if random() < (1 - self.temperature) :
+        if self.augment_data:
+            print(out)
+            print(out.shape)
+            if random() < (1 - self.temperature):
                 step = (1 - self.temperature) * 0.2
                 img, out = augment_matrix(img, out, step=step)
 
-            if random() < (1 - self.temperature) :
+            if random() < (1 - self.temperature):
                 img = self.color_shift(img)
 
             if random() < (1 - self.temperature):  # gaussian blurr
-                if random() > 0.5 :
+                if random() > 0.5:
                     kernel = 3
                     img = GaussianBlur(img, (kernel, kernel), 0)
-                else :
+                else:
                     img = self.salt_pepper(img)
 
-            if self.augment_data and random() < (1 - self.temperature) :
+            if self.augment_data and random() < (1 - self.temperature):
                 img, out = self.rotation(img, out)
                 # if random() > 0.5 :
                 #     img, out = self.rotation(img, out)
@@ -78,16 +91,16 @@ class Dataloader(Dataset) :
                 #     img = np.rot90(img)
                 #     out = np.rot90(out)
 
-            if random() < (1 - self.temperature) :
+            if random() < (1 - self.temperature):
                 img, out = self.random_patch(img, out, patch_heatmap=False)
 
-            if random() < (1 - self.temperature) :
-                    if random() > 0.5 :
-                        img, out = self.random_crop(img, out)
-                    else :
-                        img, out = self.zoom_out(img, out)
+            if random() < (1 - self.temperature):
+                if random() > 0.5:
+                    img, out = self.random_crop(img, out)
+                else:
+                    img, out = self.zoom_out(img, out)
 
-            if random() > 0.5 :
+            if random() > 0.5:
                 img, out = self.lr_flip(img, out)
 
         img = resize(img, self.size)
@@ -120,9 +133,9 @@ class Dataloader(Dataset) :
         img[tuple(coords)] = 0
         return img
 
-    def rotation(self, img, out, angle=0) :
+    def rotation(self, img, out, angle=0):
         max_angle = 30
-        angle = random() * max_angle*2 - max_angle
+        angle = random() * max_angle * 2 - max_angle
         angle = int(angle * (1 - self.temperature))
         (h, w) = img.shape[:2]
         (cX, cY) = (w // 2, h // 2)
@@ -131,8 +144,8 @@ class Dataloader(Dataset) :
         out = warpAffine(out, rotation_matrix, (w, h))
         return img, out
 
-    def zoom_out(self, img, out) :
-        reducing_factor = 1 + random() * 1 # [1, 2[
+    def zoom_out(self, img, out):
+        reducing_factor = 1 + random() * 1  # [1, 2[
         h, w, _ = img.shape
         new_size = int(w / reducing_factor), int(h / reducing_factor)
         x_margin = int(random() * (h - new_size[1]))
@@ -140,13 +153,13 @@ class Dataloader(Dataset) :
 
         grey = np.zeros_like(img)
         img = cv2.resize(img, new_size)
-        grey[x_margin : x_margin + new_size[1],
-             y_margin : y_margin + new_size[0]] = img
+        grey[x_margin: x_margin + new_size[1],
+        y_margin: y_margin + new_size[0]] = img
 
         black = np.zeros_like(out)
         out = cv2.resize(out, new_size)
-        black[x_margin : x_margin + new_size[1],
-              y_margin : y_margin + new_size[0]] = out
+        black[x_margin: x_margin + new_size[1],
+        y_margin: y_margin + new_size[0]] = out
 
         return grey, black
 
@@ -159,8 +172,8 @@ class Dataloader(Dataset) :
         ])
         return img_transform
 
-    def random_crop(self, img, out) :
-        min = 0.5 # side of the cropped image in respect to the original one
+    def random_crop(self, img, out):
+        min = 0.5  # side of the cropped image in respect to the original one
         prop = random() * (1 - min) + min
 
         h, w, _ = img.shape
@@ -180,8 +193,7 @@ class Dataloader(Dataset) :
 
         return img, out
 
-
-    def color_shift(self, img) :
+    def color_shift(self, img):
         brightness = int((random() * 128 - 64) * (1 - self.temperature))
         contrast = int((random() * 128 - 64) * (1 - self.temperature))
         hue = random() * 40 - 20
@@ -214,11 +226,11 @@ class Dataloader(Dataset) :
         patch_nb = int(random() * max_patch_nb)
         size_max = 0.5 * (1 - self.temperature)
         size_min = 0.05
-        for p in range(patch_nb) :
+        for p in range(patch_nb):
 
-            prop_x = random()**2 * size_max + size_min
-            prop_y = random() * (size_max - prop_x)**2 + size_min
-            if random() > 0.5 : prop_x, prop_y = prop_y, prop_x
+            prop_x = random() ** 2 * size_max + size_min
+            prop_y = random() * (size_max - prop_x) ** 2 + size_min
+            if random() > 0.5: prop_x, prop_y = prop_y, prop_x
 
             h, w, _ = img.shape
             xmin = int(random() * w * (1 - prop_x))
@@ -228,25 +240,25 @@ class Dataloader(Dataset) :
 
             r = random()
             # r = 0.9
-            if r < 0.3 : # noise
-                img[ymin:ymax, xmin:xmax] = np.random.randint(0, 255, (ymax-ymin, xmax-xmin, 3))
-            elif r < 0.6 : # grey shade
-                img[ymin:ymax, xmin:xmax] = np.ones((ymax-ymin, xmax-xmin, 3)) * int(random() * 255)
-            else :
-                hsv_patch = np.ones((ymax-ymin, xmax-xmin, 3)) * [random() * 180, random() * 256, random() * 256]
+            if r < 0.3:  # noise
+                img[ymin:ymax, xmin:xmax] = np.random.randint(0, 255, (ymax - ymin, xmax - xmin, 3))
+            elif r < 0.6:  # grey shade
+                img[ymin:ymax, xmin:xmax] = np.ones((ymax - ymin, xmax - xmin, 3)) * int(random() * 255)
+            else:
+                hsv_patch = np.ones((ymax - ymin, xmax - xmin, 3)) * [random() * 180, random() * 256, random() * 256]
                 bgr_patch = cv2.cvtColor(hsv_patch.astype(np.uint8), cv2.COLOR_HSV2BGR)
                 img[ymin:ymax, xmin:xmax] = bgr_patch
 
-            if patch_heatmap :
+            if patch_heatmap:
                 out[ymin:ymax, xmin:xmax] = np.zeros((xmax - xmin, ymax - ymin, out.shape[2]))
 
         return img, out
 
-    def lr_flip(self, img, out) :
+    def lr_flip(self, img, out):
         img = np.flip(img, axis=1)
         out = np.flip(out, axis=1)
-        markers = out[:,:,self.lines_nb:]
-        flipped_markers = markers[:,:,::-1]
+        markers = out[:, :, self.lines_nb:]
+        flipped_markers = markers[:, :, ::-1]
         out[:, :, self.lines_nb:] = flipped_markers
         return img, out
 
@@ -284,7 +296,7 @@ class Dataloader(Dataset) :
 def get_train_test_dataloaders(img_path, out_path, size, batch_size=32, train_test_ratio=0.8,
                                augment_data=True, shuffle=True, lines_nb=11):
     dataset = Dataloader(img_path, out_path, size, augment_data, lines_nb)
-    if train_test_ratio != 1 :
+    if train_test_ratio != 1:
         train_size = int(train_test_ratio * len(dataset))
         test_size = len(dataset) - train_size
         train_dataset, test_dataset = random_split(dataset, [train_size, test_size])
@@ -292,6 +304,6 @@ def get_train_test_dataloaders(img_path, out_path, size, batch_size=32, train_te
         test_dataset.data_augmentation = False
         test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=shuffle)
         return train_dataloader, test_dataloader
-    else :
+    else:
         dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
         return dataloader

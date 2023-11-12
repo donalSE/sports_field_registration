@@ -1,21 +1,23 @@
-from roboflow import Roboflow
-import os
+import numpy as np
 import pandas as pd
+import os
 
-abs_dataset_directory = "/Users/donalconlon/Documents/GitHub/sports_field_registration/im_ge/training_data"
+# Read data
+images_path = './im_ge/training_data/train'
+homography_csv_path = './homograph.csv'
+homography_df = pd.read_csv(homography_csv_path)
 
-# Ensure the absolute directory exists, if not, create it
-if not os.path.exists(abs_dataset_directory):
-    os.makedirs(abs_dataset_directory)
+def string_to_numpy(homography_string):
+    # Remove unwanted characters and split by space to get individual elements
+    cleaned_string = homography_string.replace('[', '').replace(']', '').replace(';', '').replace(',', '')
+    # Convert string to a list of floats
+    matrix_elements = [float(item) for item in cleaned_string.split()]
+    # Convert list to a 3x3 numpy array
+    return np.array(matrix_elements).reshape(3, 3)
 
-rf = Roboflow(api_key="hfGn1GDEH5TgyhZuTgiG")
-project = rf.workspace("donals-thesis").project("football-id-2")
-dataset = project.version(7).download("coco-segmentation")
 
-images_path = abs_dataset_directory = "/Users/donalconlon/Documents/GitHub/sports_field_registration/im_ge/training_data/train"
-
-# Load the homography CSV file into a DataFrame
-homography_df = pd.read_csv('/path/to/homograph.csv')
+# Assuming 'homography_df' is your DataFrame with the homography data
+homography_df['homography_matrix'] = homography_df['homography_matrix'].apply(string_to_numpy)
 
 # Extract the list of filenames with valid homography from the DataFrame
 valid_images = homography_df['frame_name'].tolist()
@@ -35,6 +37,21 @@ for image_filename in training_image_filenames:
         # If the file is not in the list, delete it
         os.remove(file_path)
         print(f"Removed: {image_filename}")
+
+# Define the output path where the .npy files will be saved
+output_npy_directory = './data_management/homography_matrices'
+os.makedirs(output_npy_directory, exist_ok=True)
+
+# Save each homography matrix as an .npy file
+for index, row in homography_df.iterrows():
+    homography_matrix = row['homography_matrix']
+    if homography_matrix is not None:
+        filename_without_extension = os.path.splitext(row['frame_name'])[0]
+        npy_path = os.path.join(output_npy_directory, f"{filename_without_extension}.homography.npy")
+        np.save(npy_path, homography_matrix)
+
+print(f"Saved .npy files to {output_npy_directory}")
+
 
 
 

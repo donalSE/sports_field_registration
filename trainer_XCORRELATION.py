@@ -3,10 +3,8 @@ from torch import save, load
 from torch.nn import MSELoss, L1Loss, BCELoss, CrossEntropyLoss
 from torch.optim import Adam, SGD
 from torch.optim.lr_scheduler import ReduceLROnPlateau, MultiStepLR
-
 import os
 from dataloader import get_train_test_dataloaders
-
 from model_deconv import vanilla_Unet2
 from model import deeper_Unet_like, vanilla_Unet
 
@@ -15,8 +13,8 @@ if __name__=='__main__':
     torch.cuda.empty_cache()
     # writer = SummaryWriter('runs/training')
 
-    train_img_path = 'im_ge/training_data/train'
-    out_path = './data_management/grids'
+    train_img_path = 'data_management/im_ge/training_data/train'
+    out_path = './data_management/grid'
     lines_nb = 15
     model = vanilla_Unet2(final_depth=30).cuda()
 
