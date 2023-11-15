@@ -8,7 +8,7 @@ import matplotlib
 matplotlib.use('TkAgg')
 
 
-def draw_point(data, x, y, channel, spot_size = (1, 1)) :
+def draw_point(data, x, y, channel, spot_size=(1, 1)):
     rr, cc = ellipse(x, y, spot_size[1], spot_size[0], shape=(data.shape[0], data.shape[1]))
     data[channel][rr, cc] = 255
 

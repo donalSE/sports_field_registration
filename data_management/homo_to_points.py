@@ -24,9 +24,9 @@ def get_matrix(data, out_size=(256, 256), in_size=(1920, 1080)) :
 if __name__ == "__main__" :
     # save_path = "./dense_grid/"
     # template_path = './dense_grid.npy'
-    save_path = "grid"
-    template_path = './grid.npy'
-    labels_path = 'homography_matrices/'
+    save_path = "./grid/"
+    template_path = 'grid.npy'
+    labels_path = './homography_matrices'
 
     if not os.path.exists(save_path):
         os.mkdir(save_path)
@@ -39,8 +39,8 @@ if __name__ == "__main__" :
     out_size = (1920, 1080)
     final_size = (256, 256)
 
-    #display = False
-    display = True
+    display = False
+    # display = True
 
     template = np.load(template_path)
     template = np.swapaxes(template, 2, 0)
@@ -54,8 +54,8 @@ if __name__ == "__main__" :
 
         if not np.isnan(h).any() :
             scale_factor = np.eye(3)
-            scale_factor[0, 0] = out_size[0] / 115
-            scale_factor[1, 1] = out_size[1] / 74
+            scale_factor[0, 0] = out_size[0] / 145
+            scale_factor[1, 1] = out_size[1] / 88
             h = scale_factor @ h
             h_back = np.linalg.inv(h)
 
@@ -75,13 +75,13 @@ if __name__ == "__main__" :
 
                 lines_nb = 7
                 try :
-                    img = imread(os.path.join('./im_ge/training_data/train',
-                                              img_name.replace('homography.npy', 'jpg')))
+                    img = imread(os.path.join('im_ge/train',
+                                              img_name.replace('_homography.npy', '.jpg')))
                     img = resize(img, final_size)
                 except :
                     img = imread(
-                        os.path.join('./im_ge/training_data/valid',
-                                     img_name.replace('homography.npy', 'jpg')))
+                        os.path.join('im_ge/train',
+                                     img_name.replace('_homography.npy', '.jpg')))
                     img = resize(img, final_size)
                 flat_max = np.max(result, axis=2)
                 flat_max = np.expand_dims(flat_max, axis=2)

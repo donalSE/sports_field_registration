@@ -3,7 +3,7 @@ import pandas as pd
 import os
 
 # Read data
-images_path = './im_ge/training_data/train'
+images_path = './data_management/im_ge/training_data/train'
 homography_csv_path = './homograph.csv'
 homography_df = pd.read_csv(homography_csv_path)
 
@@ -18,6 +18,9 @@ def string_to_numpy(homography_string):
 
 # Assuming 'homography_df' is your DataFrame with the homography data
 homography_df['homography_matrix'] = homography_df['homography_matrix'].apply(string_to_numpy)
+
+# Invert homography mmatrix on every row
+homography_df['homography_matrix'] = homography_df['homography_matrix'].apply(np.linalg.inv)
 
 # Extract the list of filenames with valid homography from the DataFrame
 valid_images = homography_df['frame_name'].tolist()
@@ -40,6 +43,7 @@ for image_filename in training_image_filenames:
 
 # Define the output path where the .npy files will be saved
 output_npy_directory = './data_management/homography_matrices'
+# change this to make dir if dir is not there
 os.makedirs(output_npy_directory, exist_ok=True)
 
 # Save each homography matrix as an .npy file
@@ -51,7 +55,8 @@ for index, row in homography_df.iterrows():
         np.save(npy_path, homography_matrix)
 
 print(f"Saved .npy files to {output_npy_directory}")
-
+# print the first row of homography df
+print(homography_df.iloc[0])
 
 
 

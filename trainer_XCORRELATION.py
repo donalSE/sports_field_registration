@@ -13,7 +13,7 @@ if __name__=='__main__':
     torch.cuda.empty_cache()
     # writer = SummaryWriter('runs/training')
 
-    train_img_path = 'data_management/im_ge/training_data/train'
+    train_img_path = 'data_management/im_ge/train'
     out_path = './data_management/grid'
     lines_nb = 15
     model = vanilla_Unet2(final_depth=30).cuda()

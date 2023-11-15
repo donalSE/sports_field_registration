@@ -46,25 +46,13 @@ class Dataloader(Dataset):
 
     def __getitem__(self, idx):
         img_path = self.yes_img[idx]
-        print(f"Attempting to read image from path: {img_path}")
         img = io.imread(img_path)
-        print(self.yes_out)
-        # Extract the base name without extension and directory path
-        base_name = os.path.basename(img_path)  # Get the file name without path
-        img_name, _ = os.path.splitext(base_name)  # Get the root name without extension
 
-        # Replace the last occurrence of 'jpg' with 'homography.npy'
-        out_name_parts = base_name.rsplit("jpg", 1)
-        out_name = out_name_parts[0] + "homography.npy" if len(out_name_parts) == 2 else base_name
-
+        img_name = img_path.split('/')[-1]
+        out_name = img_name.replace(".jpg", "_homography.npy")
         out_name = self.yes_out[out_name]
-        print(out_name)
         out = np.load(out_name) / 255
-
-        # Right before the line causing the error
-        print(f"Shape of out before resizing: {out.shape}")
         out = cv2.resize(out, (img.shape[1], img.shape[0]))
-        print(f"Shape of out after resizing: {out.shape}")
 
         if self.augment_data:
             print(out)
