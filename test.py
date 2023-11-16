@@ -12,10 +12,10 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 import matplotlib
-matplotlib.use('TkAgg')
+#matplotlib.use('TkAgg')
 
 from model import deeper_Unet_like, vanilla_Unet
-from model_deconv import vanilla_Unet2
+from model_deconv import vanilla_Unet2, double_Unet
 
 from utils.blobs_utils import get_boxes, a_link_to_the_past, get_local_maxima
 from video_display_dataloader import get_video_dataloaders
@@ -87,14 +87,14 @@ if __name__=='__main__':
     field_width = 88
     lines_y = np.linspace(0, field_width, 10)
 
-    path = 'pool model.pth'
+    path = 'best_model.pth'
     model = vanilla_Unet2(final_depth=len(markers_x) + len(lines_y))
 
-    batch_size = 64
+    batch_size = 12
 
     models_path = './models/'
 
-    full_images_path = '/Users/donalconlon/Documents/homographies.csv'
+    full_images_path = './frames'
 
 
     video_name = get_video_name(epochs, full_images_path, size, "", save_projection, threshold)

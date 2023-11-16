@@ -1,6 +1,8 @@
 import torch
 from torch import nn
 from torchvision.transforms import Resize
+import torch.nn.functional as F
+
 
 from random import random
 
@@ -99,7 +101,11 @@ class vanilla_Unet2 (nn.Module) :
         x_bottleneck = torch.cat((code, z4), dim=1)
 
         x4 = self.deconv4(x_bottleneck)
-        x4 = torch.cat((x4, z3), dim=1)
+        x4_padded = F.pad(x4, (0, 0, 1, 0))
+        z3_shape = z3.shape
+        x4_shape = x4.shape
+        print(f"Shape of z3: {z3_shape}, Shape of x4: {x4_shape}")
+        x4 = torch.cat((x4_padded, z3), dim=1)
         x3 = self.deconv3(x4)
         x3 = torch.cat((x3, z2), dim=1)
         x2 = self.deconv2(x3)

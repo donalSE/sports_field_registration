@@ -23,7 +23,7 @@ class Dataloader(Dataset):
 
         self.temperature = 1
 
-        yes_img = os.listdir(img_path)
+        yes_img = [f for f in os.listdir(img_path) if os.path.isfile(os.path.join(img_path, f))]
         yes_img = [os.path.join(img_path, f) for f in yes_img]
         yes_img.sort()
         yes_img.sort(key=len)
@@ -46,7 +46,8 @@ class Dataloader(Dataset):
 
     def __getitem__(self, idx):
         img_path = self.yes_img[idx]
-        img = io.imread(img_path)
+        img = cv2.imread(img_path)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
         img_name = img_path.split('/')[-1]
         out_name = img_name.replace(".jpg", "_homography.npy")
@@ -281,7 +282,7 @@ class Dataloader(Dataset):
         return out
 
 
-def get_train_test_dataloaders(img_path, out_path, size, batch_size=32, train_test_ratio=0.8,
+def get_train_test_dataloaders(img_path, out_path, size, batch_size=32, train_test_ratio=1,
                                augment_data=True, shuffle=True, lines_nb=11):
     dataset = Dataloader(img_path, out_path, size, augment_data, lines_nb)
     if train_test_ratio != 1:

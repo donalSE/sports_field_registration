@@ -1,7 +1,6 @@
-import csv
+# import csv
 import os
 import numpy as np
-import pandas as pd
 from pycocotools.coco import COCO
 import json
 from data_management.homo_utils import get_dst_points
@@ -9,7 +8,7 @@ from data_management.compute_homo import HomographyTransformer
 
 # Define Paths
 # COCO dataset path
-ANNOTATION_FILE = './data_management/im_ge/train/_annotations.coco.json'
+ANNOTATION_FILE = './data_management/im_ge/train_annotations.coco.json'
 IMAGE_DIR = './data_management/im_ge/train'
 OUT_DIR = './data_management/homography_matrices'
 
@@ -91,48 +90,48 @@ dst_mapping = get_dst_points()
 
 csv_file_path = os.path.join(OUT_DIR, 'homography_check.csv')
 
-# Create a CSV file to write the homography matrices, pixel points, and real-world points
-with open(csv_file_path, 'w', newline='') as csvfile:
-    fieldnames = ['file_name', 'homography_matrix', 'pixel_points', 'real_world_points']
-    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-    writer.writeheader()
+# # Create a CSV file to write the homography matrices, pixel points, and real-world points
+# with open(csv_file_path, 'w', newline='') as csvfile:
+#     fieldnames = ['file_name', 'homography_matrix', 'pixel_points', 'real_world_points']
+#     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+#     writer.writeheader()
 
-    # Process each entry in the data list
-    for image_data in reformatted_data_list:
-        pixel_points = []
-        real_world_points = []
+# Process each entry in the data list
+for image_data in reformatted_data_list:
+    pixel_points = []
+    real_world_points = []
 
-        # Get the corresponding real-world points for each keypoint
-        for detection in image_data['keypoints']:
-            pixel_point = detection['keypoint']
-            category_id = detection['category_id']
-            real_world_point = dst_mapping.get(category_id)
+    # Get the corresponding real-world points for each keypoint
+    for detection in image_data['keypoints']:
+        pixel_point = detection['keypoint']
+        category_id = detection['category_id']
+        real_world_point = dst_mapping.get(category_id)
 
-            if real_world_point:
-                pixel_points.append(pixel_point)
-                real_world_points.append(real_world_point)
+        if real_world_point:
+            pixel_points.append(pixel_point)
+            real_world_points.append(real_world_point)
 
-        # Check if we have enough points to compute the homography
-        if len(pixel_points) >= 4 and len(real_world_points) >= 4:
-            # Compute the homography matrix
-            transformer = HomographyTransformer(pixel_points, real_world_points)
-            H_matrix = transformer.get_homography_matrix()
-            homographies_per_image[image_data['image_id']] = H_matrix
+    # Check if we have enough points to compute the homography
+    if len(pixel_points) >= 4 and len(real_world_points) >= 4:
+        # Compute the homography matrix
+        transformer = HomographyTransformer(pixel_points, real_world_points)
+        H_matrix = transformer.get_homography_matrix()
+        homographies_per_image[image_data['image_id']] = H_matrix
 
-            # Prepare pixel and real-world points for CSV
-            pixel_points_str = ';'.join([f"({x[0]}, {x[1]})" for x in pixel_points])
-            real_world_points_str = ';'.join([f"({x[0]}, {x[1]})" for x in real_world_points])
-            homography_str = ';'.join([';'.join([f"{value}" for value in row]) for row in H_matrix])
+        # Prepare pixel and real-world points for CSV
+        pixel_points_str = ';'.join([f"({x[0]}, {x[1]})" for x in pixel_points])
+        real_world_points_str = ';'.join([f"({x[0]}, {x[1]})" for x in real_world_points])
+        homography_str = ';'.join([';'.join([f"{value}" for value in row]) for row in H_matrix])
 
-            # Write to CSV
-            writer.writerow({
-                'file_name': image_data['file_name'],
-                'homography_matrix': homography_str,
-                'pixel_points': pixel_points_str,
-                'real_world_points': real_world_points_str
-            })
-        else:
-            homographies_per_image[image_data['image_id']] = None
+        # # Write to CSV
+        # writer.writerow({
+        #     'file_name': image_data['file_name'],
+        #     'homography_matrix': homography_str,
+        #     'pixel_points': pixel_points_str,
+        #     'real_world_points': real_world_points_str
+        # })
+    else:
+        homographies_per_image[image_data['image_id']] = None
 
 # 3. Save H matrix for each image to its own .npy file
 # --------------------------------------

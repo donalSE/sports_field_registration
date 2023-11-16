@@ -13,7 +13,7 @@ if __name__=='__main__':
     torch.cuda.empty_cache()
     # writer = SummaryWriter('runs/training')
 
-    train_img_path = 'data_management/im_ge/train'
+    train_img_path = './data_management/im_ge/train'
     out_path = './data_management/grid'
     lines_nb = 15
     model = vanilla_Unet2(final_depth=30).cuda()
@@ -35,7 +35,7 @@ if __name__=='__main__':
     stagnation = 0.95
 
     train_dataloader, test_dataloader = get_train_test_dataloaders(train_img_path, out_path, size,
-                                                  batch_size=batch_size, train_test_ratio=0.8, lines_nb=lines_nb)
+                                                  batch_size=batch_size, train_test_ratio=1, lines_nb=lines_nb)
     train_dataloader.temperature = initial_temperature
     test_dataloader.augment_data = False
     print('dataloader and model loaded')

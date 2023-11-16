@@ -28,9 +28,10 @@ class Yes_Dataloader(Dataset) :
 
     def __getitem__(self, idx) :
         img_path = self.yes_img[idx]
-        img = io.imread(img_path)
+        img = cv2.imread(img_path)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         # img = self.zoom_out(img)
-        img = resize(img, (self.size))
+        img = cv2.resize(img, (img.shape[1], img.shape[0]))
         tensor_img = self.transform(img)
         tensor_img = tensor_img.view(3, tensor_img.shape[-2], tensor_img.shape[-1])
         return {'img' : img, 'tensor_img' : tensor_img, 'path': img_path}
