@@ -1,3 +1,4 @@
+#%%
 import torch
 from torch import load, unsqueeze, stack, no_grad
 from torchvision import transforms
@@ -186,3 +187,8 @@ if __name__=='__main__':
                     j+=1
                 i += 1
     video_flow.release()
+
+
+#%%
+nvidia-smi
+# %%
